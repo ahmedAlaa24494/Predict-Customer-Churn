@@ -50,12 +50,7 @@ def perform_eda(dataframe):
     """
     # Perform EDA
 
-    column_names = [
-        "Churn",
-        "Customer_Age",
-        "Marital_Status",
-        "Total_Trans",
-        "Heatmap"]
+    column_names = ["Churn", "Customer_Age", "Marital_Status", "Total_Trans", "Heatmap"]
     for column_name in column_names:
         plt.figure(figsize=(20, 10))
         if column_name == "Churn":
@@ -67,13 +62,10 @@ def perform_eda(dataframe):
         elif column_name == "Total_Trans":
             sns.displot(dataframe.Total_Trans_Ct)
         elif column_name == "Heatmap":
-            sns.heatmap(
-                dataframe.corr(),
-                annot=False,
-                cmap="Dark2_r",
-                linewidths=2)
+            sns.heatmap(dataframe.corr(), annot=False, cmap="Dark2_r", linewidths=2)
         plt.savefig(f"eda_results/{column_name}.jpg")
         plt.close()
+
 
 def encoder_helper(dataframe, category_lst):
     """
@@ -174,7 +166,7 @@ def classification_report_image(args):
         },
     }
     for model_name in list(clf_reports.keys()):
-        for split  in ['train','test']:
+        for split in ["train", "test"]:
             title = f"clf-report-{model_name}-{split}"
             axes = plt.axes()
             sns.heatmap(
@@ -209,6 +201,7 @@ def feature_importance_plot(model, x_data):
     plt.xticks(range(x_data.shape[1]), names, rotation=90)
     plt.savefig("reports/Feature_Importance.jpg")
     plt.close()
+
 
 def train_models(x_train, x_test, y_train, y_test):
     """
@@ -245,12 +238,14 @@ def train_models(x_train, x_test, y_train, y_test):
     y_test_preds_lr = lrc.predict(x_test)
 
     classification_report_image(
-        [y_train,
-        y_test,
-        y_train_preds_lr,
-        y_train_preds_rf,
-        y_test_preds_lr,
-        y_test_preds_rf]
+        [
+            y_train,
+            y_test,
+            y_train_preds_lr,
+            y_train_preds_rf,
+            y_test_preds_lr,
+            y_test_preds_rf,
+        ]
     )
     lrc_plot = plot_roc_curve(lrc, x_test, y_test)
     plt.close()
@@ -258,22 +253,26 @@ def train_models(x_train, x_test, y_train, y_test):
     axes = plt.gca()
     plot_roc_curve(cv_rfc.best_estimator_, x_test, y_test, ax=axes, alpha=0.8)
     lrc_plot.plot(ax=axes, alpha=0.8)
-    plt.savefig('reports/plot_roc_curve.jpg')
+    plt.savefig("reports/plot_roc_curve.jpg")
 
     feature_importance_plot(cv_rfc, x_test)
 
     joblib.dump(cv_rfc.best_estimator_, "models/rfc_model.pkl")
     joblib.dump(lrc, "models/logistic_model.pkl")
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     data_df = import_data("data/bank_data.csv")
     perform_eda(data_df)
-    encoded_data_df = encoder_helper(data_df,
-                                     ["Gender",
-                                      "Education_Level",
-                                      "Marital_Status",
-                                      "Income_Category",
-                                      "Card_Category"])
-    x_train_, x_test_, y_train_, y_test_ = perform_feature_engineering(
-        encoded_data_df)
+    encoded_data_df = encoder_helper(
+        data_df,
+        [
+            "Gender",
+            "Education_Level",
+            "Marital_Status",
+            "Income_Category",
+            "Card_Category",
+        ],
+    )
+    x_train_, x_test_, y_train_, y_test_ = perform_feature_engineering(encoded_data_df)
     train_models(x_train_, x_test_, y_train_, y_test_)

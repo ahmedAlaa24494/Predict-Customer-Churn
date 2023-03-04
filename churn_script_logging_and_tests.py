@@ -1,9 +1,12 @@
-import pytest
+"""
+Test Churn prediction module
+"""
 import os
 import sys
 import glob
-import joblib
 import logging
+import joblib
+import pytest
 import churn_library as cl
 
 logging.basicConfig(
@@ -15,7 +18,7 @@ logging.basicConfig(
 
 
 @pytest.fixture(name="data")
-def data():
+def data_():
     """
     fixture function to return the data raw
     """
@@ -30,7 +33,7 @@ def data():
 
 
 @pytest.fixture(name="encoded_data")
-def encoded_data(data):
+def encoded_data_(data):
     """
     encoded dataframe fixture - returns the encoded dataframe on some specific column
     """
@@ -43,7 +46,7 @@ def encoded_data(data):
                 "Marital_Status",
                 "Income_Category",
                 "Card_Category",
-            ]
+            ],
         )
         logging.info("Encoded dataframe fixture creation: SUCCESS")
     except KeyError as err:
@@ -88,7 +91,7 @@ def test_eda(data):
         "Heatmap",
     ]:
         assert os.path.isfile(f"eda_results/{image_name}.jpg")
-        logging.info(f"Succesfully loaded %s.png" % image_name)
+        logging.info("Succesfully loaded results")
 
 
 def test_encoder_helper(encoded_data):
@@ -112,9 +115,7 @@ def test_perform_feature_engineering(encoded_data):
     test perform_feature_engineering
     """
     try:
-        x_train, x_test, y_train, y_test = cl.perform_feature_engineering(
-            encoded_data
-        )
+        x_train, x_test, y_train, y_test = cl.perform_feature_engineering(encoded_data)
 
         logging.info("Feature sequence fixture creation: SUCCESS")
     except BaseException:
@@ -133,9 +134,7 @@ def test_train_models(encoded_data):
     """
     test train_models
     """
-    x_train, x_test, y_train, y_test = cl.perform_feature_engineering(
-        encoded_data
-    )
+    x_train, x_test, y_train, y_test = cl.perform_feature_engineering(encoded_data)
 
     cl.train_models(x_train, x_test, y_train, y_test)
     try:
@@ -153,7 +152,8 @@ def test_train_models(encoded_data):
         "Feature_Importance",
     ]:
         try:
-            with open("reports/%s.jpg" % image_name, "r"):
+            with open(f"reports/{image_name}.jpg", "r", encoding=None) as file_object:
+                assert file_object is not None
                 logging.info("Testing testing_models (report generation): SUCCESS")
         except FileNotFoundError as err:
             logging.error(
@@ -164,7 +164,7 @@ def test_train_models(encoded_data):
 
 if __name__ == "__main__":
     for directory in ["logs", "eda_resutls", "reports", "models"]:
-        files = glob.glob("%s/*" % directory)
+        files = glob.glob(f"{directory}/*")
         for file in files:
             os.remove(file)
     sys.exit(pytest.main(["-s"]))
