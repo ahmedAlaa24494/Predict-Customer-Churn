@@ -1,6 +1,9 @@
 # library doc string
 """
-Churn library for Full process of churn prediction
+Churn library for Full process of churn prediction.
+
+Author: Ahmed Aladdin
+Creation Data: 5/3/2023
 """
 
 # import libraries

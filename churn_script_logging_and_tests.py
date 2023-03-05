@@ -1,5 +1,8 @@
 """
-Test Churn prediction module
+Test Churn prediction module.
+
+Author: Ahmed Aladdin
+Creation Data: 5/3/2023
 """
 import os
 import sys
