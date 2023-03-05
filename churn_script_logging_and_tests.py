@@ -5,60 +5,16 @@ Author: Ahmed Aladdin
 Creation Data: 5/3/2023
 """
 import os
-import sys
-import glob
 import logging
 import joblib
-import pytest
 import churn_library as cl
 
 logging.basicConfig(
-    filename="logs/churn_library.log",
+    filename="./logs/churn_library.log",
     level=logging.INFO,
     filemode="w",
     format="%(name)s - %(levelname)s - %(message)s",
 )
-
-
-@pytest.fixture(name="data")
-def data_():
-    """
-    fixture function to return the data raw
-    """
-    try:
-        dataframe = cl.import_data("data/bank_data.csv")
-        logging.info("Raw dataframe fixture creation: SUCCESS")
-    except FileNotFoundError as err:
-        logging.error("Raw dataframe fixture creation: The file wasn't found")
-        raise err
-
-    return dataframe
-
-
-@pytest.fixture(name="encoded_data")
-def encoded_data_(data):
-    """
-    encoded dataframe fixture - returns the encoded dataframe on some specific column
-    """
-    try:
-        dataframe_encoded = cl.encoder_helper(
-            data,
-            [
-                "Gender",
-                "Education_Level",
-                "Marital_Status",
-                "Income_Category",
-                "Card_Category",
-            ],
-        )
-        logging.info("Encoded dataframe fixture creation: SUCCESS")
-    except KeyError as err:
-        logging.error(
-            "Encoded dataframe fixture creation: Not existent column to encode"
-        )
-        raise err
-    return dataframe_encoded
-
 
 def test_import():
     """
@@ -81,10 +37,11 @@ def test_import():
         raise err
 
 
-def test_eda(data):
+def test_eda():
     """
     test perform eda function
     """
+    data = cl.import_data("data/bank_data.csv")
     cl.perform_eda(data)
     for image_name in [
         "Churn",
@@ -97,10 +54,23 @@ def test_eda(data):
         logging.info("Succesfully loaded results")
 
 
-def test_encoder_helper(encoded_data):
+def test_encoder_helper():
     """
     test encoder helper
     """
+    # Load data
+    data = cl.import_data("data/bank_data.csv")
+    # Encode data
+    encoded_data = cl.encoder_helper(
+            data,
+            [
+                "Gender",
+                "Education_Level",
+                "Marital_Status",
+                "Income_Category",
+                "Card_Category",
+            ],
+        )
     assert encoded_data.shape[0] > 0
     assert encoded_data.shape[1] > 0
     for column in [
@@ -113,10 +83,23 @@ def test_encoder_helper(encoded_data):
         assert column in encoded_data
 
 
-def test_perform_feature_engineering(encoded_data):
+def test_perform_feature_engineering():
     """
     test perform_feature_engineering
     """
+    # Load data
+    data = cl.import_data("data/bank_data.csv")
+    # Encode data
+    encoded_data = cl.encoder_helper(
+            data,
+            [
+                "Gender",
+                "Education_Level",
+                "Marital_Status",
+                "Income_Category",
+                "Card_Category",
+            ],
+        )
     try:
         x_train, x_test, y_train, y_test = cl.perform_feature_engineering(encoded_data)
 
@@ -133,10 +116,23 @@ def test_perform_feature_engineering(encoded_data):
         raise err
 
 
-def test_train_models(encoded_data):
+def test_train_models():
     """
     test train_models
     """
+    # Load data
+    data = cl.import_data("data/bank_data.csv")
+    # Encode data
+    encoded_data = cl.encoder_helper(
+            data,
+            [
+                "Gender",
+                "Education_Level",
+                "Marital_Status",
+                "Income_Category",
+                "Card_Category",
+            ],
+        )
     x_train, x_test, y_train, y_test = cl.perform_feature_engineering(encoded_data)
 
     cl.train_models(x_train, x_test, y_train, y_test)
@@ -155,7 +151,7 @@ def test_train_models(encoded_data):
         "Feature_Importance",
     ]:
         try:
-            with open(f"reports/{image_name}.jpg", "r", encoding=None) as file_object:
+            with open(f"reports/{image_name}.jpg", "r", encoding='utf-8') as file_object:
                 assert file_object is not None
                 logging.info("Testing testing_models (report generation): SUCCESS")
         except FileNotFoundError as err:
@@ -164,10 +160,9 @@ def test_train_models(encoded_data):
             )
             raise err
 
-
 if __name__ == "__main__":
-    for directory in ["logs", "eda_resutls", "reports", "models"]:
-        files = glob.glob(f"{directory}/*")
-        for file in files:
-            os.remove(file)
-    sys.exit(pytest.main(["-s"]))
+    test_import()
+    test_eda()
+    test_encoder_helper()
+    test_perform_feature_engineering()
+    test_train_models()

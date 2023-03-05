@@ -29,7 +29,7 @@ pip install -r requirements.txt
 --- 
 - ### _Check Pep8 principles using pylint_
 ```
-pylint churn_library.py  churn_script_logging_and_tests.py
+pylint churn_library.py  && pylint churn_script_logging_and_tests.py
 ```
 ---
 - ### test and log the full process
