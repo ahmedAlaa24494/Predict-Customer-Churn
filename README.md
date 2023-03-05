@@ -34,7 +34,7 @@ pylint churn_library.py  && pylint churn_script_logging_and_tests.py
 ---
 - ### test and log the full process
 ```
-pytest churn_script_logging_and_tests.py
+python3 churn_script_logging_and_tests.py
 ```
 ---
 - ### Train models
